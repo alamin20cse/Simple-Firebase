@@ -1,65 +1,64 @@
-import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-
+import { GithubAuthProvider, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import auth from "../../firebase/firebase.init";
 import { useState } from "react";
 
-
 const Login = () => {
+    const [User, setUser] = useState(null);
+    const googleProvider = new GoogleAuthProvider();
+    const githubProvider = new GithubAuthProvider();
 
-    const [User,setUser]=useState(null);
-    const provider=new GoogleAuthProvider();
+    const handleGoogleSignIn = () => {
+        signInWithPopup(auth, googleProvider)
+            .then((result) => {
+                console.log(result.user);
+                setUser(result.user);
+            })
+            .catch((error) => {
+                console.log('Error:', error);
+                setUser(null);
+            });
+    };
 
-
-    const handelGoogleSignIn=()=>{
-       signInWithPopup(auth,provider)
-       .then((result)=>{
-        console.log(result.user);
-        setUser(result.user);
-       })
-       .catch((error)=>{
-
-        console.log('error this'+error);
-        setUser(null);
-       })
-
-
-
-    }
-    
-    const handelGoogleSignOut=()=>{
+    const handleGoogleSignOut = () => {
         signOut(auth)
-        .then(()=>{
-            console.log('sign out done');
-            setUser(null);
-        })
-        .catch((error)=>{
+            .then(() => {
+                console.log('Sign out done');
+                setUser(null);
+            })
+            .catch((error) => {
+                console.log('Error:', error);
+            });
+    };
 
-            console.log('error'+error);
-        })
-
-       }
-
-
+    const handleGithubSignIn = () => {
+        signInWithPopup(auth, githubProvider)
+            .then((result) => {
+                console.log(result.user);
+                setUser(result.user);
+            })
+            .catch((error) => {
+                console.log('Error:', error);
+            });
+    };
 
     return (
         <div>
-{/* 
-            <button onClick={handelGoogleSignIn}>Log in with Google</button>
-            <button onClick={handelGoogleSignOut}>Sign Out</button> */}
+            {User ? (
+                <button onClick={handleGoogleSignOut}>Sign Out</button>
+            ) : (
+                <div>
+                    <button onClick={handleGoogleSignIn}>Log in with Google</button>
+                    <button onClick={handleGithubSignIn}>Log in with GitHub</button>
+                </div>
+            )}
 
-            {
-                User  ?    <button onClick={handelGoogleSignOut}>Sign Out</button>:  <button onClick={handelGoogleSignIn}>Log in with Google</button>
-            }
-
-            {User && <div>
-
-                <img src={User.photoURL}/>
-                <h3>{User.displayName}</h3>
-                <h4>Email: {User.email}</h4>
-
-
-            </div> }
-            
+            {User && (
+                <div>
+                    <img src={User.photoURL} alt="User profile" />
+                    <h3>{User.displayName}</h3>
+                    <h4>Email: {User.email}</h4>
+                </div>
+            )}
         </div>
     );
 };
